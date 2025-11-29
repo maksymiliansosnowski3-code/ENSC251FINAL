@@ -13,7 +13,7 @@ CrewMember::CrewMember(std::string first, std::string last,
     } catch (const std::invalid_argument& e) {
         throw;
     }
-}
+} 
 
 void CrewMember::setFirstName(const std::string& fn) {
     if (fn.empty()) throw std::invalid_argument("first name empty");

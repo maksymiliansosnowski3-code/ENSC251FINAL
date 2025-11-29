@@ -32,6 +32,9 @@ struct alienArchives : humanArchives {
 	double Total;
 };
 
+thanks 
+
+
 int readIntSafe() {
 	int value;
 	cin >> value;

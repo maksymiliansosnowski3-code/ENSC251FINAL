@@ -15,5 +15,6 @@ std::ostream& operator<<(std::ostream& os, const HumanCrew& h) {
        << " | Sector: " << h.home_sector
        << " | Training: " << h.getTrainingScore()
        << " | Aptitude: " << h.getMissionAptitude();
+       << " | ID: " << h.getID();
     return os;
 }

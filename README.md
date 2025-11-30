@@ -1,9 +1,9 @@
 # ENSC251FINAL
-Collab for ENSC 251 Final
+Collaboration for ENSC 251 Final
 
-Members 
-Maks
-evan
-marco 
-gavyn 
+Members: 
+Maksymilian Sosnowski
+Evan Yu
+Marco Chavez
+Gavyn Sidhu 
 

@@ -156,7 +156,7 @@ int main() {
         try {
             HumanCrew obj(h.FirstName, h.LastName,
                           (float)h.TrainingScore, (int)h.MissionAptitude,
-                          25220000, h.Sector);
+                          h.ID, h.Sector);
             humans.push_back(obj);
         } catch (...) {
             return 1;
@@ -174,7 +174,7 @@ int main() {
             );
             AlienCrew obj(a.FirstName, a.LastName,
                           (float)a.TrainingScore, (int)a.MissionAptitude,
-                          25220000, a.Homeworld, t);
+                          a.ID, a.Homeworld, t);
             aliens.push_back(obj);
         } catch (...) {
             return 1;

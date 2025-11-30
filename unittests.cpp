@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
 
 #include "linkedlist.hpp"
 #include "humancrew.hpp"

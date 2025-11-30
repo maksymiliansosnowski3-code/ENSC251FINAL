@@ -391,13 +391,22 @@ int main() {
                 }
             }
 
-            sort(merged.begin(), merged.end(),
-            [](const MEntry& a, const MEntry& b) {
+            
+            auto cmp = [](const MEntry& a, const MEntry& b) {
                 if (a.apt != b.apt) return a.apt > b.apt;
                 if (a.train != b.train) return a.train > b.train;
                 if (a.isHuman != b.isHuman) return a.isHuman && !b.isHuman;
                 return false;
-            });
+            };
+            for (size_t i = 1; i < merged.size(); ++i) {
+                MEntry key = merged[i];
+                int j = (int)i - 1;
+                while (j >= 0 && cmp(key, merged[j])) {
+                    merged[j + 1] = merged[j];
+                    --j;
+                }
+                merged[j + 1] = key;
+            }
 
             for (auto& e : merged) {
                 if (e.isHuman) {

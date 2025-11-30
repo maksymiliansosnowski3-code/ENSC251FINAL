@@ -47,9 +47,9 @@ static void testInsertOrderingHumans(TestSummary &s) {
     LinkedList list;
     // Insert humans with various aptitudes/training to exercise ordering
     // Higher aptitude first, tie-breaker training score higher first
-    list.insertSorted(new HumanCrew("Alice", "A", 3.0f, 90, 1001, "Alpha"));
-    list.insertSorted(new HumanCrew("Bob",   "B", 4.0f, 85, 1002, "Beta"));
-    list.insertSorted(new HumanCrew("Cara",  "C", 2.0f, 90, 1003, "Gamma")); // same aptitude as Alice, lower training -> after Alice
+    list.insertSorted(new HumanCrew("Alice", "A", 3.0f, 90, 25220001, "Alpha"));
+    list.insertSorted(new HumanCrew("Bob",   "B", 4.0f, 85, 25220002, "Beta"));
+    list.insertSorted(new HumanCrew("Cara",  "C", 2.0f, 90, 25220003, "Gamma")); // same aptitude as Alice, lower training -> after Alice
     auto v = collectList(list);
     bool ok = (v.size() == 3)
               && (v[0]->getFirstName() == "Alice")
@@ -67,9 +67,9 @@ static void testInsertOrderingAliens(TestSummary &s) {
     LinkedList list;
     TelepathicLinkTest t1(5,5,5,5); // total 20
     TelepathicLinkTest t2(1,1,1,1); // total 4
-    list.insertSorted(new AlienCrew("Xeno","X", 3.0f, 95, 2001, "Vulcar", t1)); // top aptitude
-    list.insertSorted(new AlienCrew("Yuri","Y", 3.5f, 90, 2002, "Orion", t2));
-    list.insertSorted(new AlienCrew("Zeta","Z", 4.0f, 95, 2003, "Trask", t2)); // tie aptitude with Xeno, but training higher -> should appear before Xeno if comparator sorts on training
+    list.insertSorted(new AlienCrew("Xeno","X", 3.0f, 95, 25220011, "Vulcar", t1)); // top aptitude
+    list.insertSorted(new AlienCrew("Yuri","Y", 3.5f, 90, 25220012, "Orion", t2));
+    list.insertSorted(new AlienCrew("Zeta","Z", 4.0f, 95, 25220013, "Trask", t2)); // tie aptitude with Xeno, but training higher -> should appear before Xeno if comparator sorts on training
     auto v = collectList(list);
     bool ok = (v.size() == 3);
     if (ok) {
@@ -82,9 +82,9 @@ static void testInsertOrderingAliens(TestSummary &s) {
 
 static void testSearchOperations(TestSummary &s) {
     LinkedList list;
-    list.insertSorted(new HumanCrew("Sam","Search", 2.5f, 70, 3001, "Delta"));
-    list.insertSorted(new HumanCrew("Pat","Find",   3.0f, 75, 3002, "Omega"));
-    list.insertSorted(new AlienCrew("Al","One",     2.0f, 60, 4001, "Vulcar", TelepathicLinkTest(2,2,2,2)));
+    list.insertSorted(new HumanCrew("Sam","Search", 2.5f, 70, 25220021, "Delta"));
+    list.insertSorted(new HumanCrew("Pat","Find",   3.0f, 75, 25220022, "Omega"));
+    list.insertSorted(new AlienCrew("Al","One",     2.0f, 60, 25220031, "Vulcar", TelepathicLinkTest(2,2,2,2)));
     // search by ID (direct traversal check)
     bool found3002 = false;
     for (auto *m : collectList(list)) {
@@ -129,9 +129,9 @@ static void testSearchOperations(TestSummary &s) {
 
 static void testDeletionByNameAndHeadTail(TestSummary &s) {
     LinkedList list;
-    list.insertSorted(new HumanCrew("Del","Me", 1.0f, 50, 5001, "Alpha"));
-    list.insertSorted(new HumanCrew("Keep","One",2.0f, 60, 5002, "Beta"));
-    list.insertSorted(new HumanCrew("Del","Me", 3.0f, 70, 5003, "Gamma")); // duplicate name Del Me
+    list.insertSorted(new HumanCrew("Del","Me", 1.0f, 50, 25220041, "Alpha"));
+    list.insertSorted(new HumanCrew("Keep","One",2.0f, 60, 25220042, "Beta"));
+    list.insertSorted(new HumanCrew("Del","Me", 3.0f, 70, 25220043, "Gamma")); // duplicate name Del Me
     // we have 3 nodes
     auto before = collectList(list);
     expect(s, before.size() == 3, "Precondition: 3 nodes present before deletion.");
@@ -155,12 +155,12 @@ static void testDeletionByNameAndHeadTail(TestSummary &s) {
 static void testMergeAndQualifiedFiltering(TestSummary &s) {
     // Build vectors similar to main's merging behavior and verify ordering
     vector<HumanCrew> humans;
-    humans.emplace_back("H1","A", 3.0f, 95, 6001, "Alpha");
-    humans.emplace_back("H2","B", 4.0f, 90, 6002, "Beta");
+    humans.emplace_back("H1","A", 3.0f, 95, 25220051, "Alpha");
+    humans.emplace_back("H2","B", 4.0f, 90, 25220052, "Beta");
     vector<AlienCrew> aliens;
-    aliens.emplace_back("A1","X", 3.5f, 95, 7001, "Vulcar", TelepathicLinkTest(5,5,3,2)); // total 15 -> qualifies
-    aliens.emplace_back("A2","Y", 3.5f, 95, 7002, "Orion", TelepathicLinkTest(1,1,1,1)); // total 4 -> doesn't qualify
-    aliens.emplace_back("A3","Z", 2.0f, 93, 7003, "Trask", TelepathicLinkTest(6,6,6,6)); // total 24 -> qualifies
+    aliens.emplace_back("A1","X", 3.5f, 95, 25220061, "Vulcar", TelepathicLinkTest(5,5,3,2)); // total 15 -> qualifies
+    aliens.emplace_back("A2","Y", 3.5f, 95, 25220062, "Orion", TelepathicLinkTest(1,1,1,1)); // total 4 -> doesn't qualify
+    aliens.emplace_back("A3","Z", 2.0f, 93, 25220063, "Trask", TelepathicLinkTest(6,6,6,6)); // total 24 -> qualifies
 
     struct MEntry { bool isHuman; size_t index; double apt; double train; };
 

@@ -132,7 +132,7 @@ static void testDeletionByNameAndHeadTail(TestSummary &s) {
     list.insertSorted(new HumanCrew("Del","Me", 1.0f, 50, 5001, "Alpha"));
     list.insertSorted(new HumanCrew("Keep","One",2.0f, 60, 5002, "Beta"));
     list.insertSorted(new HumanCrew("Del","Me", 3.0f, 70, 5003, "Gamma")); // duplicate name Del Me
-    // ensure we have 3 nodes
+    // we have 3 nodes
     auto before = collectList(list);
     expect(s, before.size() == 3, "Precondition: 3 nodes present before deletion.");
 
@@ -174,7 +174,7 @@ static void testMergeAndQualifiedFiltering(TestSummary &s) {
         }
     }
 
-    // Replace std::sort with insertion sort for the test (same comparator)
+
     auto cmp = [](const MEntry& a, const MEntry& b) {
         if (a.apt != b.apt) return a.apt > b.apt;
         if (a.train != b.train) return a.train > b.train;

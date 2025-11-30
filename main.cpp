@@ -23,6 +23,7 @@ struct humanArchives {
     string Sector;
     double TrainingScore;
     double MissionAptitude;
+    double ID;
 };
 
 struct alienArchives : humanArchives {
@@ -32,6 +33,7 @@ struct alienArchives : humanArchives {
     double EmpathicOverlay;
     double CognitiveResistance;
     double Total;
+    double ID;
 };
 
 int readIntSafe() {
@@ -66,6 +68,7 @@ bool isValidHomeworld(const string& w) {
     return false;
 }
 
+
 bool parseHumanLine(const string& line, humanArchives& out) {
     if (line.empty()) return true;
     stringstream ss(line);
@@ -73,7 +76,8 @@ bool parseHumanLine(const string& line, humanArchives& out) {
             >> out.LastName
             >> out.Sector
             >> out.TrainingScore
-            >> out.MissionAptitude)) {
+            >> out.MissionAptitude
+            >> out.ID)) {
         return false;
     }
     StringManip::typoCorrector(out.Sector);
@@ -95,7 +99,8 @@ bool parseAlienLine(const string& line, alienArchives& out) {
             >> out.CognitiveLink
             >> out.EmpathicOverlay
             >> out.CognitiveResistance
-            >> out.Total)) {
+            >> out.Total
+            >> out.ID)) {
         return false;
     }
     if (!isValidHomeworld(out.Homeworld)) return false;
@@ -155,8 +160,8 @@ int main() {
     for (auto& h : humanInfo) {
         try {
             HumanCrew obj(h.FirstName, h.LastName,
-                          (float)h.TrainingScore, (int)h.MissionAptitude,
-                          h.ID, h.Sector);
+                          (float)h.TrainingScore, (int)h.MissionAptitude, h.ID,
+                          h.Sector);
             humans.push_back(obj);
         } catch (...) {
             return 1;
@@ -194,6 +199,7 @@ int main() {
         cout << "5. Merge and display qualified recruits\n";
         cout << "6. Exit\n";
         cout << "7. Run unit tests\n";
+        cout << "8. Search for recruit\n"
         choice = readIntSafe();
 
         switch (choice) {
@@ -202,7 +208,7 @@ int main() {
             int category = readIntSafe();
 
             if (category == 1) {
-                cout << "1. Mission Aptitude\n2. Training Score\n3. Home Sector\n";
+                cout << "1. Mission Aptitude\n2. Training Score\n3. Home Sector\n4: ID\n";
                 int field = readIntSafe();
 
                 vector<size_t> idx(humans.size());
@@ -237,6 +243,16 @@ int main() {
                         auto& h = humans[idx[k]];
                         cout << h.getFirstName() << " " << h.getLastName()
                              << " | Sector: " << h.getHomeSector() << "\n";
+                    }
+                } else if (field == 4) {
+                    vector<double> keys(idx.size());
+                    for (size_t k = 0; k < idx.size(); k++)
+                        keys[k] = humans[idx[k]].getID();
+                    CrewSort::sortLowToHigh(keys, idx);
+                    for (size_t k = 0; k < idx.size(); k++) {
+                        auto& h = humans[idx[k]];
+                        cout << h.getFirstName() << " " << h.getLastName()
+                             << " | ID: " << h.getID() << "\n";
                     }
                 }
             } else if (category == 2) {
@@ -275,6 +291,16 @@ int main() {
                         auto& a = aliens[idx[k]];
                         cout << a.getFirstName() << " " << a.getLastName()
                              << " | Homeworld: " << a.getHomeworld() << "\n";
+                    }
+                } else if (field == 4) {
+                    vector<double> keys(idx.size());
+                    for (size_t k = 0; k < idx.size(); k++)
+                        keys[k] = aliens[idx[k]].getID();
+                    CrewSort::sortLowToHigh(keys, idx);
+                    for (size_t k = 0; k < idx.size(); k++) {
+                        auto& a = aliens[idx[k]];
+                        cout << a.getFirstName() << " " << a.getLastName()
+                             << " | ID: " << a.getID() << "\n";
                     }
                 }
             }
@@ -416,6 +442,7 @@ int main() {
                          << " | Aptitude: " << h.getMissionAptitude()
                          << " | Training: " << h.getTrainingScore()
                          << " | Sector: " << h.getHomeSector() << "\n";
+                         << " | ID: " << h.getID() << "\n";
                 } else {
                     const AlienCrew& a = aliens[e.index];
                     cout << "Alien "
@@ -424,6 +451,7 @@ int main() {
                          << " | Training: " << a.getTrainingScore()
                          << " | Homeworld: " << a.getHomeworld()
                          << " | TLT Total: " << a.getTelepathicLinkTest().getTotal()
+                         << " | ID: " << a.getID()
                          << "\n";
                 }
             }
@@ -437,6 +465,11 @@ int main() {
             runAllUnitTests();
             break;
         }
+        case 8:
+            cout << "1. Humans\n2. Aliens\n";
+            int category = readIntSafe();
+            
+            break;
     }
 
     return 0;

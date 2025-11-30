@@ -1,7 +1,4 @@
-// NOTE: This is a modified version of your existing main.cpp with an added unit-tests menu option.
-// Replace main.cpp in your repository with this version (or merge the small changes) to add:
-//   7. Run unit tests
-// and to call the runAllUnitTests() function.
+// ENSC251 C++ Programming Final Project 
 #include <iostream>
 #include <fstream>
 #include <string>

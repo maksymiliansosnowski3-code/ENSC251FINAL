@@ -7,5 +7,3 @@ evan
 marco 
 gavyn 
 
-
-faq you bro >:l

@@ -43,13 +43,6 @@ static vector<CrewMember*> collectList(const LinkedList &list) {
     return out;
 }
 
-static void clearNodes(LinkedList &list) {
-    // destructor of LinkedList will delete nodes and their CrewMember pointers,
-    // so to free memory we can let list go out of scope; here we manually
-    // iterate and delete nodes by destroying the list via scope trick.
-    // We'll rely on LinkedList destructor when it goes out of scope (caller).
-}
-
 static void testInsertOrderingHumans(TestSummary &s) {
     LinkedList list;
     // Insert humans with various aptitudes/training to exercise ordering
@@ -180,15 +173,27 @@ static void testMergeAndQualifiedFiltering(TestSummary &s) {
             merged.push_back({false, i, (double)aliens[i].getMissionAptitude(), (double)aliens[i].getTrainingScore()});
         }
     }
-    sort(merged.begin(), merged.end(), [](const MEntry& a, const MEntry& b) {
+
+    // Replace std::sort with insertion sort for the test (same comparator)
+    auto cmp = [](const MEntry& a, const MEntry& b) {
         if (a.apt != b.apt) return a.apt > b.apt;
         if (a.train != b.train) return a.train > b.train;
         if (a.isHuman != b.isHuman) return a.isHuman && !b.isHuman;
         return false;
-    });
+    };
+    for (size_t i = 1; i < merged.size(); ++i) {
+        MEntry key = merged[i];
+        int j = (int)i - 1;
+        while (j >= 0 && cmp(key, merged[j])) {
+            merged[j + 1] = merged[j];
+            --j;
+        }
+        merged[j + 1] = key;
+    }
+
     // Verify that:
-    // - only A1 and A3 from aliens are present (A2 filtered out)
-    // - ordering respects aptitude, training, and human-before-alien tie-break
+    // only A1 and A3 from aliens are present (A2 filtered out)
+    // ordering respects aptitude, training, and human-before-alien tie-break
     bool filteredCorrect = (merged.size() == 4); // 2 humans + 2 qualified aliens
     expect(s, filteredCorrect, "Merge filtering: only qualified aliens are included.");
 

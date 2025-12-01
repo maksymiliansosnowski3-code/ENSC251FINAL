@@ -248,7 +248,9 @@ int main() {
         cout << "5. Merge and display qualified recruits\n";
         cout << "6. Exit\n";
         cout << "7. Run unit tests\n";
-        cout << "8. View search logs";
+        cout << "8. View search logs\n";
+        cout << "9. Search recruits\n";
+
         choice = readIntSafe();
 
         switch (choice) {
@@ -538,10 +540,48 @@ int main() {
         case 8:
             logger.show();
             break;
+       case 9: {
+        
+            cout << "Search by:\n";
+            cout << "1. ID number\n";
+            cout << "2. TrainingScore\n";
+            cout << "3. MissionAptitude\n";
+            cout << "4. Full name (First Last)\n";
 
+            int opt = readIntSafe();
+
+            if (opt == 1) {
+                cout << "Enter ID: ";
+                int id = readIntSafe();
+                logger.log("SEARCH BY ID: " + to_string(id));
+                list.searchByID(id);
+            } else if (opt == 2) {
+                cout << "Enter TrainingScore (e.g. 3.5): ";
+                double ts;
+                cin >> ts;
+                logger.log("SEARCH BY TRAINING: " + to_string(ts));
+                list.searchByTrainingScore(ts);
+            } else if (opt == 3) {
+                cout << "Enter MissionAptitude (integer): ";
+                int apt = readIntSafe();
+                logger.log("SEARCH BY APTITUDE: " + to_string(apt));
+                list.searchByMissionAptitude(apt);
+            } else if (opt == 4) {
+                cout << "Enter FirstName and LastName: ";
+                string fn, ln;
+                cin >> fn >> ln;
+                string full = fn + " " + ln;
+                logger.log("SEARCH BY NAME: " + full);
+                list.searchByName(full);
+            } else {
+                cout << "Invalid search option.\n";
+            }
+
+            break;
+        }
 
         default:
-            cout << "Invalid option. Please enter a number from 1 to 8.\n";
+            cout << "Invalid option. Please enter a number from 1 to 9.\n";
             break;
         } // end switch
     } // end while

@@ -1,18 +1,17 @@
 #include <iostream>
 #include <string>
+#include <cmath>
 #include "node.hpp"
 #include "linkedlist.hpp"
 #include "stringManip.hpp"
 #include <fstream>
+
 using namespace std;
 
-// default constructor to initialize the linked list with head and tail as nullptr
 LinkedList::LinkedList() {
     head = nullptr;
     tail = nullptr;
 }
-
-// destructor to free memory allocated for the linked list
 
 LinkedList::~LinkedList() {
     Node* curr = head;
@@ -21,6 +20,16 @@ LinkedList::~LinkedList() {
         delete curr;
         curr = nextNode;
     }
+}
+
+// Helper to print a crew member's key info in a consistent format
+static void printCrewMemberInfo(const CrewMember* data) {
+    if (data == nullptr) return;
+    cout << "Name: " << data->getFirstName() << " " << data->getLastName() << "\n";
+    cout << "ID: " << data->getId() << "\n";
+    cout << "Training Score: " << data->getTrainingScore() << "\n";
+    cout << "Mission Aptitude: " << data->getMissionAptitude() << "\n";
+    cout << "--------------------------\n";
 }
 
 // inserts a CrewMember into the linked list in sorted order
@@ -33,6 +42,7 @@ void LinkedList::insertSorted(CrewMember* member) {
         return;
     }
 
+    // If new member should be placed before head (assuming '>' means higher priority)
     if (*(newNode->getData()) > *(head->getData())) {
         newNode->setNext(head);
         head = newNode;
@@ -54,19 +64,23 @@ void LinkedList::insertSorted(CrewMember* member) {
     }
 }
 
-// deletes all nodes with a CrewMember matching the given name
+// deletes all nodes with a CrewMember matching the given name (case-insensitive exact full name)
 void LinkedList::deleteWithName(string name) {
     if (!head) return;
 
     string target = StringManip::toUpper(name);
     Node* curr = head;
     Node* prev = nullptr;
-    // go thru the list to find matches
     while (curr != nullptr) {
         CrewMember* data = curr->getData();
+        if (data == nullptr) {
+            prev = curr;
+            curr = curr->getNext();
+            continue;
+        }
         string full = data->getFirstName() + " " + data->getLastName();
         string upperFull = StringManip::toUpper(full);
-        // If a match is found, delete the node
+
         if (upperFull == target) {
             if (curr == head) {
                 head = head->getNext();
@@ -87,17 +101,13 @@ void LinkedList::deleteWithName(string name) {
 }
 
 // searches for CrewMembers by ID and prints matches
-
 void LinkedList::searchByID(int id) const {
     Node* curr = head;
     bool found = false;
     while (curr != nullptr) {
         CrewMember* data = curr->getData();
-        if (data != nullptr && (int)data->getId() == id) {
-            cout << "Match found: "
-                 << data->getFirstName() << " "
-                 << data->getLastName()
-                 << " (ID " << data->getId() << ")\n";
+        if (data != nullptr && data->getId() == id) {
+            printCrewMemberInfo(data);
             found = true;
         }
         curr = curr->getNext();
@@ -108,65 +118,90 @@ void LinkedList::searchByID(int id) const {
     }
 }
 
+// searches for CrewMembers by name (case-insensitive, partial match allowed) and prints matches
 void LinkedList::searchByName(string name) const {
-    Node* curr = head;
-    bool found = false;
+    if (name.empty()) {
+        cout << "Please provide a name to search for.\n";
+        return;
+    }
 
     string target = StringManip::toUpper(name);
-    // go thru the list to find matches
+    Node* curr = head;
+    bool found = false;
+
     while (curr != nullptr) {
         CrewMember* data = curr->getData();
-        string full = data->getFirstName() + " " + data->getLastName();
-        if (StringManip::toUpper(full) == target) {
-            cout << "Found: " << full << "\n";
-            found = true;
+        if (data != nullptr) {
+            string first = StringManip::toUpper(data->getFirstName());
+            string last  = StringManip::toUpper(data->getLastName());
+            string full  = first + " " + last;
+
+            // partial match: target appears in first, last, or full
+            if (first.find(target) != string::npos ||
+                last.find(target)  != string::npos ||
+                full.find(target)  != string::npos) {
+                printCrewMemberInfo(data);
+                found = true;
+            }
         }
         curr = curr->getNext();
     }
 
-    if (!found) cout << "No match found.\n";
+    if (!found) {
+        cout << "No match found for name: " << name << "\n";
+    }
 }
 
+// searches for CrewMembers by training score and prints matches (uses epsilon)
 void LinkedList::searchByTrainingScore(double trainingScore) const {
+    const double EPS = 1e-6;
     Node* curr = head;
     bool found = false;
 
     while (curr != nullptr) {
         CrewMember* data = curr->getData();
-        if (data->getTrainingScore() == trainingScore) {
-            cout << data->getFirstName() << " " << data->getLastName()
-                 << " | Training: " << data->getTrainingScore() << "\n";
-            found = true;
+        if (data != nullptr) {
+            if (fabs(data->getTrainingScore() - trainingScore) <= EPS) {
+                printCrewMemberInfo(data);
+                found = true;
+            }
         }
         curr = curr->getNext();
     }
 
-    if (!found) cout << "No match found.\n";
+    if (!found) {
+        cout << "No match found for training score: " << trainingScore << "\n";
+    }
 }
 
-// searches for CrewMembers by mission aptitude and prints matches
+// searches for CrewMembers by mission aptitude and prints matches (uses epsilon)
 void LinkedList::searchByMissionAptitude(double missionAptitude) const {
+    const double EPS = 1e-6;
     Node* curr = head;
     bool found = false;
-    // go thru the list to find matches
+
     while (curr != nullptr) {
         CrewMember* data = curr->getData();
-        if (data->getMissionAptitude() == missionAptitude) {
-            cout << data->getFirstName() << " " << data->getLastName()
-                 << " | Aptitude: " << data->getMissionAptitude() << "\n";
-            found = true;
+        if (data != nullptr) {
+            if (fabs(data->getMissionAptitude() - missionAptitude) <= EPS) {
+                printCrewMemberInfo(data);
+                found = true;
+            }
         }
         curr = curr->getNext();
     }
 
-    if (!found) cout << "No match found.\n";
+    if (!found) {
+        cout << "No match found for mission aptitude: " << missionAptitude << "\n";
+    }
 }
 
 // returns the head node of the linked list
 Node* LinkedList::getHead() const {
     return head;
 }
-//  returns the next node after head
+
+// returns the next node after head
 Node* LinkedList::getNext() const {
     return head ? head->getNext() : nullptr;
 }

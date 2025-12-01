@@ -13,8 +13,8 @@ void HumanCrew::setHomeSector(const std::string& sec) {
 std::ostream& operator<<(std::ostream& os, const HumanCrew& h) {
     os << h.getFirstName() << " " << h.getLastName()
        << " | Sector: " << h.home_sector
+       << " | Aptitude: " << h.getMissionAptitude()
        << " | Training: " << h.getTrainingScore()
-       << " | Aptitude: " << h.getMissionAptitude();
-       << " | ID: " << h.getID();
+       << " | ID: " << h.getId();
     return os;
 }

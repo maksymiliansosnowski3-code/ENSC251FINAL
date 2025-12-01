@@ -1,4 +1,4 @@
-#include "Logger.hpp"
+#include "logger.hpp" // fixed case: was "Logger.hpp" causing missing header error
 #include <fstream> // for file reading and writing
 #include <iostream>
 using namespace std;

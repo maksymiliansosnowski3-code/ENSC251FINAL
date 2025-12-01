@@ -85,12 +85,11 @@ static void testSearchOperations(TestSummary &s) {
     list.insertSorted(new HumanCrew("Pat","Find",   3.0f, 75, 25220022, "Omega"));
     list.insertSorted(new AlienCrew("Al","One",     2.0f, 60, 25220031, "Vulcar", TelepathicLinkTest(2,2,2,2)));
     // search by ID (direct traversal check)
-    bool found3002 = false;
-    for (auto *m : collectList(list)) {
-        if ((int)m->getId() == 3002) found3002 = true;
-    }
-    expect(s, found3002, "Search by ID: found existing ID (3002).");
-
+    bool foundID = false;
+for (auto *m : collectList(list)) {
+    if ((int)m->getId() == 25220022) foundID = true;
+}
+expect(s, foundID, "Search by ID: found existing large ID (25220022).");
     // search by training score exact match
     bool foundTS3 = false;
     for (auto *m : collectList(list)) {

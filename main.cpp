@@ -18,6 +18,7 @@
 #include "linkedlist.hpp"
 #include "stringManip.hpp"
 #include "unittests.hpp"
+#include "logger.hpp"
 
 using namespace std;
 
@@ -29,7 +30,8 @@ struct MEntry {
     double train;
 };
 
-// insertion sort for merged vector of MEntry
+// Insertion sort for merged vector using the project's comparator rules.
+// Simple and easy to read for beginners.
 static void insertionSortMerged(vector<MEntry> &merged) {
     auto cmp = [](const MEntry& a, const MEntry& b) {
         if (a.apt != b.apt) return a.apt > b.apt;            // higher aptitude first
@@ -49,7 +51,6 @@ static void insertionSortMerged(vector<MEntry> &merged) {
     }
 }
 
-// Structs for reading/parsing data files
 struct humanArchives {
     string FirstName;
     string LastName;
@@ -67,11 +68,9 @@ struct alienArchives : humanArchives {
     double Total;
 };
 
-// Safe integer input function
 int readIntSafe() {
     int value;
     cin >> value;
-    // Clear input until valid integer is read
     while (!cin) {
         cin.clear();
         cin.ignore(10000, '\n');
@@ -80,9 +79,7 @@ int readIntSafe() {
     return value;
 }
 
-// Validation functions
 bool isValidSector(const string& s) {
-    // List of valid sectors
     static const string valid[] = {
         "Alpha", "Beta", "Gamma", "Delta", "Sigma", "Zeta", "Omega"
     };
@@ -120,7 +117,6 @@ bool parseHumanLine(const string& line, humanArchives& out) {
     return true;
 }
 
-// Parses and validates a line from alien-crew.txt
 bool parseAlienLine(const string& line, alienArchives& out) {
     if (line.empty()) return true;
     stringstream ss(line);
@@ -136,7 +132,6 @@ bool parseAlienLine(const string& line, alienArchives& out) {
             >> out.Total)) {
         return false;
     }
-    // Correct typos in Homeworld
     if (!isValidHomeworld(out.Homeworld)) return false;
     if (out.TrainingScore < 0.0 || out.TrainingScore > 4.3) return false;
     if (out.MissionAptitude < 0.0 || out.MissionAptitude > 100.0) return false;
@@ -152,6 +147,8 @@ bool parseAlienLine(const string& line, alienArchives& out) {
     if (out.Total < 0.0 || out.Total > 40.0) return false;
     return true;
 }
+
+Logger logger;
 
 int main() {
     vector<humanArchives> humanInfo;
@@ -236,7 +233,7 @@ int main() {
     for (auto& a : aliens) list.insertSorted(new AlienCrew(a));
 
     int choice = 0;
-    while (choice != 7) {
+    while (choice != 6) {
         cout << "1. Single-field sort\n";
         cout << "2. Overall sort\n";
         cout << "3. Insert new recruit\n";
@@ -244,7 +241,7 @@ int main() {
         cout << "5. Merge and display qualified recruits\n";
         cout << "6. Exit\n";
         cout << "7. Run unit tests\n";
-        cout << ""
+        cout << "8. View search logs";
         choice = readIntSafe();
 
         switch (choice) {
@@ -260,6 +257,7 @@ int main() {
                 for (size_t i = 0; i < idx.size(); i++) idx[i] = i;
 
                 if (field == 1) {
+                    logger.log("SINGLE-FIELD SORT: Humans by Mission Aptitude");
                     vector<double> keys(idx.size());
                     for (size_t k = 0; k < idx.size(); k++)
                         keys[k] = humans[idx[k]].getMissionAptitude();
@@ -270,6 +268,7 @@ int main() {
                              << " | Aptitude: " << h.getMissionAptitude() << "\n";
                     }
                 } else if (field == 2) {
+                    logger.log("SINGLE-FIELD SORT: Humans by Training Score");
                     vector<double> keys(idx.size());
                     for (size_t k = 0; k < idx.size(); k++)
                         keys[k] = humans[idx[k]].getTrainingScore();
@@ -280,6 +279,7 @@ int main() {
                              << " | Training: " << h.getTrainingScore() << "\n";
                     }
                 } else if (field == 3) {
+                    logger.log("SINGLE-FIELD SORT: Humans by Home Sector");
                     vector<string> keys(idx.size());
                     for (size_t k = 0; k < idx.size(); k++)
                         keys[k] = humans[idx[k]].getHomeSector();
@@ -298,6 +298,7 @@ int main() {
                 for (size_t i = 0; i < idx.size(); i++) idx[i] = i;
 
                 if (field == 1) {
+                    logger.log("SINGLE-FIELD SORT: Aliens by Mission Aptitude");
                     vector<double> keys(idx.size());
                     for (size_t k = 0; k < idx.size(); k++)
                         keys[k] = aliens[idx[k]].getMissionAptitude();
@@ -308,6 +309,7 @@ int main() {
                              << " | Aptitude: " << a.getMissionAptitude() << "\n";
                     }
                 } else if (field == 2) {
+                    logger.log("SINGLE-FIELD SORT: Aliens by Training Score");
                     vector<double> keys(idx.size());
                     for (size_t k = 0; k < idx.size(); k++)
                         keys[k] = aliens[idx[k]].getTrainingScore();
@@ -318,6 +320,7 @@ int main() {
                              << " | Training: " << a.getTrainingScore() << "\n";
                     }
                 } else if (field == 3) {
+                    logger.log("SINGLE-FIELD SORT: Aliens by Home World");
                     vector<string> keys(idx.size());
                     for (size_t k = 0; k < idx.size(); k++)
                         keys[k] = aliens[idx[k]].getHomeworld();
@@ -363,6 +366,7 @@ int main() {
             int cat = readIntSafe();
 
             if (cat == 1) {
+                logger.log("INSERT HUMAN");
                 cout << "Enter: FirstName LastName HomeSector TrainingScore MissionAptitude\n";
                 string fn, ln, sec;
                 double ts;
@@ -382,6 +386,7 @@ int main() {
                     cout << "Failed to insert Human: unknown error\n";
                 }
             } else if (cat == 2) {
+                logger.log("INSERT ALIEN");
                 cout << "Enter: FirstName LastName Homeworld TrainingScore MissionAptitude SignalStrength CognitiveLink EmpathicOverlay CognitiveResistance\n";
                 string fn, ln, world;
                 double ts;
@@ -412,6 +417,8 @@ int main() {
             cin >> first >> last;
             string fullName = first + " " + last;
             string upperName = StringManip::toUpper(fullName);
+            
+            logger.log("DELETE REQUEST: name = " + fullName);
 
             // count nodes and vector sizes before deletion
             auto countListNodes = [&]() {
@@ -457,13 +464,22 @@ int main() {
             if (removedFromList > 0 || removedHumans > 0 || removedAliens > 0) {
                 cout << "Deleted " << removedFromList << " node(s) from linked list";
                 cout << " (Humans removed: " << removedHumans << ", Aliens removed: " << removedAliens << ").\n";
+                logger.log(
+                    "DELETE SUCCESS: name = " + fullName +
+                    " | list nodes removed = " + std::to_string(removedFromList) +
+                    " | humans removed = " + std::to_string(removedHumans) +
+                    " | aliens removed = " + std::to_string(removedAliens)
+            );
             } else {
                 cout << "No recruit found with name: " << fullName << "\n";
+                logger.log("DELETE FAILED: no recruit found with name = " + fullName);
             }
             break;
         }
 
         case 5: {
+            logger.log("MERGE AND DISPLAY QUALIFIED RECRUITS");
+
             vector<MEntry> merged;
             merged.reserve(humans.size() + aliens.size());
 
@@ -511,14 +527,13 @@ int main() {
         case 7:
             runAllUnitTests();
             break;
-
         case 8:
             logger.show();
             break;
 
 
         default:
-            cout << "Invalid option. Please enter a number from 1 to 7.\n";
+            cout << "Invalid option. Please enter a number from 1 to 8.\n";
             break;
         } // end switch
     } // end while

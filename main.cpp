@@ -150,6 +150,13 @@ bool parseAlienLine(const string& line, alienArchives& out) {
 
 Logger logger;
 
+// Add a simple deterministic ID generator so every created crew member gets a unique ID.
+// Starts at the previous literal value for compatibility, increments on each call.
+static int getNextId() {
+    static int nextId = 25220000;
+    return nextId++;
+}
+
 int main() {
     vector<humanArchives> humanInfo;
     vector<alienArchives> alienInfo;
@@ -195,7 +202,7 @@ int main() {
         try {
             HumanCrew obj(h.FirstName, h.LastName,
                           (float)h.TrainingScore, (int)h.MissionAptitude,
-                          25220000, h.Sector);
+                          getNextId(), h.Sector);
             humans.push_back(obj);
         } catch (const std::exception &e) {
             cerr << "Failed to construct HumanCrew: " << e.what() << "\n";
@@ -217,7 +224,7 @@ int main() {
             );
             AlienCrew obj(a.FirstName, a.LastName,
                           (float)a.TrainingScore, (int)a.MissionAptitude,
-                          25220000, a.Homeworld, t);
+                          getNextId(), a.Homeworld, t);
             aliens.push_back(obj);
         } catch (const std::exception &e) {
             cerr << "Failed to construct AlienCrew: " << e.what() << "\n";
@@ -373,7 +380,7 @@ int main() {
                 int apt;
                 cin >> fn >> ln >> sec >> ts >> apt;
                 try {
-                    HumanCrew obj(fn, ln, (float)ts, apt, 25220000, sec);
+                    HumanCrew obj(fn, ln, (float)ts, apt, getNextId(), sec);
                     humans.push_back(obj);
                     list.insertSorted(new HumanCrew(obj));
                     cout << "Inserted Human: " << obj.getFirstName() << " " << obj.getLastName()
@@ -394,7 +401,7 @@ int main() {
                 cin >> fn >> ln >> world >> ts >> apt >> s >> c >> e >> r;
                 try {
                     TelepathicLinkTest t(s, c, e, r);
-                    AlienCrew obj(fn, ln, (float)ts, apt, 25220000, world, t);
+                    AlienCrew obj(fn, ln, (float)ts, apt, getNextId(), world, t);
                     aliens.push_back(obj);
                     list.insertSorted(new AlienCrew(obj));
                     cout << "Inserted Alien: " << obj.getFirstName() << " " << obj.getLastName()

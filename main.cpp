@@ -29,8 +29,7 @@ struct MEntry {
     double train;
 };
 
-// Insertion sort for merged vector using the project's comparator rules.
-// Simple and easy to read for beginners.
+// insertion sort for merged vector of MEntry
 static void insertionSortMerged(vector<MEntry> &merged) {
     auto cmp = [](const MEntry& a, const MEntry& b) {
         if (a.apt != b.apt) return a.apt > b.apt;            // higher aptitude first
@@ -50,6 +49,7 @@ static void insertionSortMerged(vector<MEntry> &merged) {
     }
 }
 
+// Structs for reading/parsing data files
 struct humanArchives {
     string FirstName;
     string LastName;
@@ -67,9 +67,11 @@ struct alienArchives : humanArchives {
     double Total;
 };
 
+// Safe integer input function
 int readIntSafe() {
     int value;
     cin >> value;
+    // Clear input until valid integer is read
     while (!cin) {
         cin.clear();
         cin.ignore(10000, '\n');
@@ -78,7 +80,9 @@ int readIntSafe() {
     return value;
 }
 
+// Validation functions
 bool isValidSector(const string& s) {
+    // List of valid sectors
     static const string valid[] = {
         "Alpha", "Beta", "Gamma", "Delta", "Sigma", "Zeta", "Omega"
     };
@@ -116,6 +120,7 @@ bool parseHumanLine(const string& line, humanArchives& out) {
     return true;
 }
 
+// Parses and validates a line from alien-crew.txt
 bool parseAlienLine(const string& line, alienArchives& out) {
     if (line.empty()) return true;
     stringstream ss(line);
@@ -131,6 +136,7 @@ bool parseAlienLine(const string& line, alienArchives& out) {
             >> out.Total)) {
         return false;
     }
+    // Correct typos in Homeworld
     if (!isValidHomeworld(out.Homeworld)) return false;
     if (out.TrainingScore < 0.0 || out.TrainingScore > 4.3) return false;
     if (out.MissionAptitude < 0.0 || out.MissionAptitude > 100.0) return false;
@@ -238,6 +244,7 @@ int main() {
         cout << "5. Merge and display qualified recruits\n";
         cout << "6. Exit\n";
         cout << "7. Run unit tests\n";
+        cout << ""
         choice = readIntSafe();
 
         switch (choice) {
@@ -504,6 +511,11 @@ int main() {
         case 7:
             runAllUnitTests();
             break;
+
+        case 8:
+            logger.show();
+            break;
+
 
         default:
             cout << "Invalid option. Please enter a number from 1 to 7.\n";

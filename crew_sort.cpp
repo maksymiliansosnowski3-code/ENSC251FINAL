@@ -7,7 +7,9 @@
 
 using namespace std;
 
+
 void CrewSort::sortHighToLow(vector<double>& keys, vector<size_t>& idx) {
+    // insertion sort algorithm to sort keys and idx
     for (int i = 0; i < (int)keys.size(); i++) {
         double kVal = keys[i];
         size_t idVal = idx[i];
@@ -23,6 +25,7 @@ void CrewSort::sortHighToLow(vector<double>& keys, vector<size_t>& idx) {
     }
 }
 
+// insertion sort algorithm for strings A to Z
 void CrewSort::sortAToZ(vector<string>& keys, vector<size_t>& idx) {
     for (int i = 0; i < (int)keys.size(); i++) {
         string kVal = keys[i];

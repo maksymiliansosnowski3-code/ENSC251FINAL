@@ -1,7 +1,7 @@
 #include "logger.hpp" // fixed case: was "Logger.hpp" causing missing header error
 #include <fstream> // for file reading and writing
 #include <iostream>
-using namespace std;
+using namespace std; 
 
 Logger::Logger(const string& file) {
     filename = file;

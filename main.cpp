@@ -533,6 +533,7 @@ int main() {
 
         case 7:
             runAllUnitTests();
+            logger.log("UNIT TEST FINISHED");
             break;
         case 8:
             logger.show();

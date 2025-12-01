@@ -44,12 +44,16 @@ static vector<CrewMember*> collectList(const LinkedList &list) {
 
 static void testInsertOrderingHumans(TestSummary &s) {
     LinkedList list;
-    // Use valid IDs (>= 25220000)
+    // Insert humans with various aptitudes/training to exercise ordering
+    // Higher aptitude first, tie-breaker training score higher first
     list.insertSorted(new HumanCrew("Alice", "A", 3.0f, 90, 25220001, "Alpha"));
     list.insertSorted(new HumanCrew("Bob",   "B", 4.0f, 85, 25220002, "Beta"));
     list.insertSorted(new HumanCrew("Cara",  "C", 2.0f, 90, 25220003, "Gamma")); // same aptitude as Alice, lower training -> after Alice
     auto v = collectList(list);
-    bool ok = (v.size() == 3);
+    bool ok = (v.size() == 3)
+              && (v[0]->getFirstName() == "Alice")
+              && (v[1]->getFirstName() == "Cara" || v[1]->getFirstName() == "Bob"); // depends on comparator, but Alice must be first
+    // More strict ordering:
     if (v.size() == 3) {
         ok = (v[0]->getFirstName() == "Alice")
              && (v[1]->getFirstName() == "Cara")
@@ -62,13 +66,13 @@ static void testInsertOrderingAliens(TestSummary &s) {
     LinkedList list;
     TelepathicLinkTest t1(5,5,5,5); // total 20
     TelepathicLinkTest t2(1,1,1,1); // total 4
-    // Use valid IDs
     list.insertSorted(new AlienCrew("Xeno","X", 3.0f, 95, 25220011, "Vulcar", t1)); // top aptitude
     list.insertSorted(new AlienCrew("Yuri","Y", 3.5f, 90, 25220012, "Orion", t2));
-    list.insertSorted(new AlienCrew("Zeta","Z", 4.0f, 95, 25220013, "Trask", t2)); // tie aptitude with Xeno
+    list.insertSorted(new AlienCrew("Zeta","Z", 4.0f, 95, 25220013, "Trask", t2)); // tie aptitude with Xeno, but training higher -> should appear before Xeno if comparator sorts on training
     auto v = collectList(list);
     bool ok = (v.size() == 3);
     if (ok) {
+        // expected first: Zeta or Xeno depending on training tie-break; ensure highest aptitude ones are first two
         ok = ((v[0]->getMissionAptitude() >= v[1]->getMissionAptitude()) &&
               (v[1]->getMissionAptitude() >= v[2]->getMissionAptitude()));
     }
@@ -77,20 +81,15 @@ static void testInsertOrderingAliens(TestSummary &s) {
 
 static void testSearchOperations(TestSummary &s) {
     LinkedList list;
-    // valid IDs
-    unsigned int idSam = 25220021;
-    unsigned int idPat = 25220022;
-    unsigned int idAl  = 25220031;
-    list.insertSorted(new HumanCrew("Sam","Search", 2.5f, 70, idSam, "Delta"));
-    list.insertSorted(new HumanCrew("Pat","Find",   3.0f, 75, idPat, "Omega"));
-    list.insertSorted(new AlienCrew("Al","One",     2.0f, 60, idAl, "Vulcar", TelepathicLinkTest(2,2,2,2)));
-
-    // search by ID (direct traversal check) - search for the ID we inserted (idPat)
-    bool foundIdPat = false;
+    list.insertSorted(new HumanCrew("Sam","Search", 2.5f, 70, 25220021, "Delta"));
+    list.insertSorted(new HumanCrew("Pat","Find",   3.0f, 75, 25220022, "Omega"));
+    list.insertSorted(new AlienCrew("Al","One",     2.0f, 60, 25220031, "Vulcar", TelepathicLinkTest(2,2,2,2)));
+    // search by ID (direct traversal check)
+    bool found3002 = false;
     for (auto *m : collectList(list)) {
-        if (m->getId() == idPat) { foundIdPat = true; break; }
+        if ((int)m->getId() == 3002) found3002 = true;
     }
-    expect(s, foundIdPat, "Search by ID: found existing ID (idPat).");
+    expect(s, found3002, "Search by ID: found existing ID (3002).");
 
     // search by training score exact match
     bool foundTS3 = false;
@@ -122,20 +121,21 @@ static void testSearchOperations(TestSummary &s) {
     // illegal: search non-existing ID
     bool found9999 = false;
     for (auto *m : collectList(list)) {
-        if (m->getId() == 9999) found9999 = true;
+        if ((int)m->getId() == 9999) found9999 = true;
     }
     expect(s, !found9999, "Search by ID: non-existent ID correctly not found.");
 }
 
 static void testDeletionByNameAndHeadTail(TestSummary &s) {
     LinkedList list;
-    // valid IDs
     list.insertSorted(new HumanCrew("Del","Me", 1.0f, 50, 25220041, "Alpha"));
     list.insertSorted(new HumanCrew("Keep","One",2.0f, 60, 25220042, "Beta"));
     list.insertSorted(new HumanCrew("Del","Me", 3.0f, 70, 25220043, "Gamma")); // duplicate name Del Me
+    // we have 3 nodes
     auto before = collectList(list);
     expect(s, before.size() == 3, "Precondition: 3 nodes present before deletion.");
 
+    // delete "Del Me" should remove both nodes with that full name
     list.deleteWithName("Del Me");
     auto after = collectList(list);
     bool noneDelMe = true;
@@ -145,6 +145,7 @@ static void testDeletionByNameAndHeadTail(TestSummary &s) {
     }
     expect(s, noneDelMe && after.size() == 1 && after[0]->getFirstName() == "Keep", "Deletion by full name removes all matches (including head/tail).");
 
+    // delete non-existent name: should leave list unchanged (size remains 1)
     list.deleteWithName("No Name");
     auto after2 = collectList(list);
     expect(s, after2.size() == 1 && after2[0]->getFirstName() == "Keep", "Deletion of non-existent name leaves list unchanged.");
@@ -172,7 +173,7 @@ static void testMergeAndQualifiedFiltering(TestSummary &s) {
         }
     }
 
-    // Insertion sort comparator (same ordering rules as main)
+
     auto cmp = [](const MEntry& a, const MEntry& b) {
         if (a.apt != b.apt) return a.apt > b.apt;
         if (a.train != b.train) return a.train > b.train;
@@ -189,9 +190,13 @@ static void testMergeAndQualifiedFiltering(TestSummary &s) {
         merged[j + 1] = key;
     }
 
+    // Verify that:
+    // only A1 and A3 from aliens are present (A2 filtered out)
+    // ordering respects aptitude, training, and human-before-alien tie-break
     bool filteredCorrect = (merged.size() == 4); // 2 humans + 2 qualified aliens
     expect(s, filteredCorrect, "Merge filtering: only qualified aliens are included.");
 
+    // Check that merged[0] has the highest aptitude among entries
     if (merged.size() >= 2) {
         bool orderOk = true;
         for (size_t i = 1; i < merged.size(); ++i) {
